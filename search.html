@@ -167,7 +167,7 @@
                         <li>
                             <a href="#">销量</a>
                         </li>
-                        <li @click="search.sortBy='createTime'" :class="{active: search.sortBy==='createTime'}">
+                        <li @click="handleSort('createTime')" :class="{active: search.sortBy==='createTime'}">
                             <a href="#">新品</a>
                         </li>
                         <li>
@@ -415,6 +415,8 @@
                     }
                     this.total = data.total;
                     this.totalPage = data.totalPage;
+                    data.categories = data.categories || [];
+                    data.specs = data.specs || [];
 
                     //初始化商品分类过滤参数
                     if(data.categories.length === 1){
@@ -476,8 +478,10 @@
             selectFilter(k, o){
                 const obj = {};
                 Object.assign(obj, this.search);
-                if(k === '分类' || k === '品牌'){
+                if(['分类', '品牌'].includes(k)){
                     o = o.id;
+                    if (k === '品牌') k = 'brandId';
+                    if (k === '分类') k = 'cid3';
                 }
                 obj.filter[k] = o.name || o;
                 this.search = obj;
@@ -491,12 +495,18 @@
                 // 判断是否是品牌
                 if(k === 'brandId'){
                     // 返回品牌名称
-                    return this.filters.find(f => f.k === 'brandId').options[0].name;
+                    return this.filters.find(f => f.k === '品牌').options[0].name;
                 }
                 return v;
             },
             removeFilter(k){
                 this.search.filter[k] = null;
+            },
+            handleSort(value) {
+                this.search = {
+                    ...this.search,
+                    sortBy: value
+                };
             }
         },
 
